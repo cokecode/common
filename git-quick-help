@@ -1,0 +1,23 @@
+git status
+git add *.c
+git alias
+git branch
+git branch -r
+git ci -a
+
+git clone https://github.com/cokecode/common.git
+git remote add upstream https://github.com/cokecode/common.git
+git fetch upstream
+
+git config -l
+git config alias.br branch
+git config alias.ci commit
+git config alias.st status
+git help clone
+git help config
+
+git log
+
+git push origin master
+git remote show origin
+
