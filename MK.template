@@ -1,0 +1,73 @@
+##############################################################################
+## Makefile template
+## zhangxun@taobao.com
+## 2008-12-23
+
+################################################################
+## iSearch specific
+ifeq ($(SIMON), 1)
+CFLAGS += -I$(TOPDIR)/../simon/simonisearch
+CFLAGS += -DSIMON
+LDFLAGS += -L$(TOPDIR)/../simon -lsimon
+endif
+CFLAGS += -I$(TOPDIR)/../contribute/mxml-2.2.2
+CFLAGS += -D_FILE_OFFSET_BITS=64
+CFLAGS += -fPIC -DSHMEM
+LDFLAGS += -L$(TOPDIR)/../library
+LDFLAGS += -L./../../../contribute/mxml-2.2.2 -lmxml
+################################################################
+
+CC = gcc
+CXX = g++
+CFLAGS := -Wall $(CFLAGS)
+
+ifdef O
+CFLAGS += -O$(O)
+LDFLAGS += -O$(O)
+endif
+
+CFLAGS += -g
+
+ifdef APP_TARGET
+TARGET = $(APP_TARGET)
+endif
+ifdef LIB_TARGET
+TARGET = $(LIB_TARGET)
+endif
+
+ifdef SRCS
+OBJS = $(SRCS:.cpp=.o)
+endif
+DEPS = $(foreach f, $(OBJS), $(dir $f).$(notdir $(f:.o=.d)))
+
+all:: $(TARGET)
+
+ifdef APP_TARGET
+$(TARGET): $(OBJS)
+	$(CXX) -o $@ $^ $(LDFLAGS)
+endif
+ifdef LIB_TARGET
+$(TARGET): $(OBJS)
+	$(AR) rvs $@ $^
+endif
+
+.cpp.o:
+	$(CXX) $(CFLAGS) -MMD -MF $(dir $@).$(notdir $(@:.o=.d)) -c -o $@ $<
+
+.c.o:
+	$(CC) $(CFLAGS) -MMD -MF $(dir $@).$(notdir $(@:.o=.d)) -c -o $@ $<
+
+clean::
+	$(RM) $(TARGET) $(OBJS) $(DEPS)
+
+help:
+	@echo 'Makefile for iSearch(R), Taobao.com 2008'
+	@echo 'Options:'
+	@echo '  make O=3         => gcc -O3'
+	@echo '  make G=1         => gcc -g'
+	@echo '  make SIMON=1     => gcc -DSIMON -Isimon*** -Lsimon***'
+
+-include $(DEPS)
+.SUFFIXES: .c .cpp .o .d .mod .so
+
+# vim:ft=make

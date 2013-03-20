@@ -1,0 +1,207 @@
+# -*- Makefile template -*-
+# Rev 1.5
+# Based on drangon's (drangon@freecity.cn) Makefile.template.
+# yongbao.chen@net263.com
+# 2006-01-06
+#
+# I wrote this file to make things more simple. You may write your own
+# Makefile like this:
+#   --- Makefile ---
+#   APP_TARGET = foo
+#   USER_CFLAGS = -I/xxx/yyy/include
+#   USER_LDFLAGS = -L/xxx/yyy/lib -lzzz
+#   SRCS = foo.c bar.cpp foobar.cxx
+#   include Makefile.template
+#   --- Makefile ---
+#
+# User-defined variables:
+#   CC, CXX, LINKER   (optional)
+#   USER_CFLAGS, USER_LDFLAGS  (optional, often required)
+#   OPTIMIZE_LEVEL / O_LEVEL    (optional)
+#   APP_TARGET, LIB_TARGET, DSO_TARGET
+#                              (Should NOT include path seperator '/'!!!)
+#                              (required and only one required)
+#   SRCS                       (required)
+#   SRCPATH, OBJPATH, BINPATH  (optional)
+#
+# NOTE  Press 'PageDown` to see DETAILED documentation.
+#
+
+CC ?= gcc
+CXX ?= g++
+CFLAGS = -Wall $(USER_CFLAGS)
+LDFLAGS = $(USER_LDFLAGS)
+
+ifndef SRCPATH
+SRCPATH = .
+endif
+ifndef OBJPATH
+OBJPATH = .
+endif
+ifndef BINPATH
+BINPATH = .
+endif
+
+OBJS := $(patsubst %.c, %.o, $(SRCS))
+OBJS := $(patsubst %.C, %.o, $(OBJS))
+OBJS := $(patsubst %.cpp, %.o, $(OBJS))
+OBJS := $(patsubst %.cxx, %.o, $(OBJS))
+DEPS := $(foreach f, $(SRCS), $(shell echo `dirname $(f)`/.dep.`basename $(f)`))
+DEPS := $(patsubst %.c, %.d, $(DEPS))
+DEPS := $(patsubst %.C, %.d, $(DEPS))
+DEPS := $(patsubst %.cpp, %.d, $(DEPS))
+DEPS := $(patsubst %.cxx, %.d, $(DEPS))
+
+REAL_SRCS = $(addprefix $(SRCPATH)/, $(SRCS))
+REAL_OBJS = $(addprefix $(OBJPATH)/, $(OBJS))
+REAL_DEPS = $(addprefix $(OBJPATH)/, $(DEPS))
+REAL_TARGET = $(OBJPATH)/$(TARGET)
+
+DEBUG_FLAG_FILE = $(OBJPATH)/..$(TARGET).debug
+RELEASE_FLAG_FILE = $(OBJPATH)/..$(TARGET).release
+
+ifdef VERSION_MAJOR
+CFLAGS += -DVERSION_MAJOR=$(VERSION_MAJOR)
+PROG_VERSION = $(VERSION_MAJOR)
+endif
+ifdef VERSION_MINOR
+CFLAGS += -DVERSION_MINOR=$(VERSION_MINOR)
+PROG_VERSION := $(PROG_VERSION).$(VERSION_MINOR)
+endif
+ifdef VERSION_TAG
+CFLAGS += -DVERSION_TAG="\"$(VERSION_TAG)\""
+PROG_VERSION := $(PROG_VERSION)-$(VERSION_TAG)
+endif
+
+ifdef PROG_VERSION
+	CFLAGS += -DPROG_VERSION="\"$(PROG_VERSION)\""
+endif
+
+ifdef LINKER
+	COMPILER_LINKER = $(LINKER)
+endif
+
+ifdef COMPILER_LINKER
+	ifeq ($(COMPILER_LINKER), CC)
+		COMPILER_LINKER=$(CC)
+	endif
+	ifeq ($(COMPILER_LINKER), CXX)
+		COMPILER_LINKER=$(CXX)
+	endif
+else
+	COMPILER_LINKER = $(CXX)
+endif
+
+TARGET = XXX-SEE-MAKEFILE-DOT-TEMPLATE-FOR-DETAILS
+ifdef APP_TARGET
+	TARGET = $(APP_TARGET)
+endif
+ifdef LIB_TARGET
+	TARGET = $(LIB_TARGET)
+endif
+ifdef DSO_TARGET
+	TARGET = $(DSO_TARGET)
+endif
+
+ifdef DSO_TARGET
+	CFLAGS += -fPIC -shared
+endif
+
+O_LEVEL ?= -O2
+OPTIMIZE_LEVEL ?= $(O_LEVEL)
+
+ifndef ZZZ_DEBUG
+	Q = @
+endif
+
+.PHONY: all debug release clean z
+
+all:: debug
+
+debug:: CFLAGS += -DDEBUG -g
+release:: CFLAGS += -DNDEBUG -g $(OPTIMIZE_LEVEL)
+
+debug:: $(DEBUG_FLAG_FILE) $(REAL_TARGET)
+	$Q [ -e $(RELEASE_FLAG_FILE) ] && rm -f $(RELEASE_FLAG_FILE); exit 0;
+	$Q [ -e $(DEBUG_FLAG_FILE) ] || touch $(DEBUG_FLAG_FILE); exit 0;
+release:: $(RELEASE_FLAG_FILE) $(REAL_TARGET)
+	$Q [ -e $(DEBUG_FLAG_FILE) ] && rm -f $(DEBUG_FLAG_FILE); exit 0;
+	$Q [ -e $(RELEASE_FLAG_FILE) ] || touch $(RELEASE_FLAG_FILE); exit 0;
+
+$(DEBUG_FLAG_FILE):
+	$Q rm -f $(REAL_OBJS) $(REAL_DEPS) $(REAL_TARGET) $(RELEASE_FLAG_FILE)
+$(RELEASE_FLAG_FILE):
+	$Q rm -f $(REAL_OBJS) $(REAL_DEPS) $(REAL_TARGET) $(DEBUG_FLAG_FILE)
+
+# for debug
+z:
+	@echo "SRCPATH = $(SRCPATH)"
+	@echo "OBJPATH = $(OBJPATH)"
+	@echo "SRCS = $(SRCS)"
+	@echo "OBJS = $(OBJS)"
+	@echo "DEPS = $(DEPS)"
+	@echo "REAL_SRCS = $(REAL_SRCS)"
+	@echo "REAL_OBJS = $(REAL_OBJS)"
+	@echo "REAL_DEPS = $(REAL_DEPS)"
+	@echo "CC = $(CC)"
+	@echo "CXX = $(CXX)"
+	@echo "CFLAGS = $(CFLAGS)"
+	@echo "LDFLAGS = $(LDFLAGS)"
+
+#
+# TODO Assemble .s files
+#
+
+$(OBJPATH)/%.o: $(SRCPATH)/%.c
+	$(CC) $(CFLAGS) -MMD -c -o $@ $<
+	$Q TMP=$(@:.o=.d); cd `dirname $$TMP`; mv `basename $$TMP` .dep.`basename $$TMP`
+
+$(OBJPATH)/%.o: $(SRCPATH)/%.C
+	$(CXX) $(CFLAGS) -MMD -c -o $@ $<
+	$Q TMP=$(@:.o=.d); cd `dirname $$TMP`; mv `basename $$TMP` .dep.`basename $$TMP`
+
+$(OBJPATH)/%.o: $(SRCPATH)/%.cxx
+	$(CXX) $(CFLAGS) -MMD -c -o $@ $<
+	$Q TMP=$(@:.o=.d); cd `dirname $$TMP`; mv `basename $$TMP` .dep.`basename $$TMP`
+
+$(OBJPATH)/%.o: $(SRCPATH)/%.cpp
+	$(CXX) $(CFLAGS) -MMD -c -o $@ $<
+	$Q TMP=$(@:.o=.d); cd `dirname $$TMP`; mv `basename $$TMP` .dep.`basename $$TMP`
+
+ifdef APP_TARGET
+$(REAL_TARGET):: $(REAL_OBJS)
+	$(COMPILER_LINKER) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+endif
+
+ifdef LIB_TARGET
+$(REAL_TARGET):: $(REAL_OBJS)
+	$(AR) crsv $@ $^
+endif
+
+ifdef DSO_TARGET
+$(REAL_TARGET):: $(REAL_OBJS)
+	$(COMPILER_LINKER) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+endif
+
+#
+# TODO KMOD_TARGET
+#
+
+ifneq ($(BINPATH), $(OBJPATH))
+debug release:: $(BINPATH)/$(TARGET)
+$(BINPATH)/$(TARGET): $(REAL_TARGET)
+	cp -f $< $@
+endif
+
+clean::
+	$Q $(RM) $(REAL_TARGET) $(DEBUG_FLAG_FILE) $(RELEASE_FLAG_FILE)
+	$Q $(RM) $(REAL_OBJS) $(REAL_DEPS)
+	$Q $(RM) $(BINPATH)/$(TARGET)
+
+-include $(REAL_DEPS)
+
+# ----------------------------------------------------------------------------
+# Examples:
+#
+#   TODO..................................
+#

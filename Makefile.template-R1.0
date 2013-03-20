@@ -1,0 +1,147 @@
+# -*- Makefile template -*-
+# Rev 1.0
+# Based on drangon's (drangon@freecity.cn) Makefile.template.
+# yongbao.chen@net263.com
+# 2006-01-06
+#
+# I wrote this file to make things more simple. You may write your own
+# Makefile like this:
+#   --- Makefile ---
+#   APP_TARGET = foo
+#   USER_CFLAGS = -I/xxx/yyy/include
+#   USER_LDFLAGS = -L/xxx/yyy/lib -lzzz
+#   SRCS = foo.c bar.cpp foobar.cxx
+#   include Makefile.template
+#   --- Makefile ---
+#
+# User-defined variables:
+#  CC, CXX, COMPILER_LINKER,
+#  USER_CFLAGS, USER_LDFLAGS, OPTIMIZE_LEVEL,
+#  APP_TARGET, LIB_TARGET, DSO_TARGET,
+#  SRCS,
+#
+
+CC ?= gcc
+CXX ?= g++
+CFLAGS = -Wall $(USER_CFLAGS)
+LDFLAGS = $(USER_LDFLAGS)
+
+OBJS := $(patsubst %.c, %.o, $(SRCS))
+OBJS := $(patsubst %.C, %.o, $(OBJS))
+OBJS := $(patsubst %.cpp, %.o, $(OBJS))
+OBJS := $(patsubst %.cxx, %.o, $(OBJS))
+DEPS := $(foreach f, $(SRCS), $(shell echo `dirname $(f)`/.dep.`basename $(f)`))
+DEPS := $(patsubst %.c, %.d, $(DEPS))
+DEPS := $(patsubst %.C, %.d, $(DEPS))
+DEPS := $(patsubst %.cpp, %.d, $(DEPS))
+DEPS := $(patsubst %.cxx, %.d, $(DEPS))
+
+ifdef PROG_VERSION
+	ifdef BUILD_NUMBER
+		CFLAGS += -DPROG_VERSION="\"$(PROG_VERSION)-$(BUILD_NUMBER)\""
+	else
+		CFLAGS += -DPROG_VERSION="\"$(PROG_VERSION)-internal\""
+	endif
+endif
+
+ifdef COMPILER_LINKER
+ifeq ($(COMPILER_LINKER), CC)
+COMPILER_LINKER=$(CC)
+endif
+ifeq ($(COMPILER_LINKER), CXX)
+COMPILER_LINKER=$(CXX)
+endif
+else
+COMPILER_LINKER = $(CXX)
+endif
+
+TARGET = XXX-SEE-MAKEFILE-DOT-TEMPLATE-FOR-DETAILS
+ifdef APP_TARGET
+TARGET = $(APP_TARGET)
+endif
+ifdef LIB_TARGET
+TARGET = $(LIB_TARGET)
+endif
+ifdef DSO_TARGET
+TARGET = $(DSO_TARGET)
+endif
+
+ifdef DSO_TARGET
+CFLAGS += -fPIC -shared
+endif
+
+OPTIMIZE_LEVEL ?= -O2
+
+.PHONY: all debug release clean z
+
+all:: debug
+
+debug:: CFLAGS += -DDEBUG -g
+release:: CFLAGS += -DNDEBUG -g $(OPTIMIZE_LEVEL)
+
+debug:: ..$(TARGET).debug $(TARGET)
+	@rm -f ..$(TARGET).release
+	@touch ..$(TARGET).debug
+release:: ..$(TARGET).release $(TARGET)
+	@rm -f ..$(TARGET).debug
+	@touch ..$(TARGET).release
+
+..$(TARGET).debug:
+	@rm -f $(OBJS) $(DEPS) $(TARGET) ..$(TARGET).release
+..$(TARGET).release:
+	@rm -f $(OBJS) $(DEPS) $(TARGET) ..$(TARGET).debug
+
+# for debug
+z:
+	@echo "SRCS = $(SRCS)"
+	@echo "OBJS = $(OBJS)"
+	@echo "DEPS = $(DEPS)"
+	@echo "CC = $(CC)"
+	@echo "CXX = $(CXX)"
+	@echo "CFLAGS = $(CFLAGS)"
+	@echo "LDFLAGS = $(LDFLAGS)"
+
+#
+# TODO Assemble .s files
+#
+
+.c.o:
+	$(CC) $(CFLAGS) -MMD -c -o $@ $<
+	@TMP=$(@:.o=.d); cd `dirname $$TMP`; mv `basename $$TMP` .dep.`basename $$TMP`
+
+.C.o:
+	$(CXX) $(CFLAGS) -MMD -c -o $@ $<
+	@TMP=$(@:.o=.d); cd `dirname $$TMP`; mv `basename $$TMP` .dep.`basename $$TMP`
+
+%.o: %.cxx
+	$(CXX) $(CFLAGS) -MMD -c -o $@ $<
+	@TMP=$(@:.o=.d); cd `dirname $$TMP`; mv `basename $$TMP` .dep.`basename $$TMP`
+
+.cpp.o:
+	$(CXX) $(CFLAGS) -MMD -c -o $@ $<
+	@TMP=$(@:.o=.d); cd `dirname $$TMP`; mv `basename $$TMP` .dep.`basename $$TMP`
+
+ifdef APP_TARGET
+$(TARGET):: $(OBJS)
+	$(COMPILER_LINKER) $(CFLAGS) -o $(TARGET) $^ $(LDFLAGS)
+endif
+
+ifdef LIB_TARGET
+$(TARGET):: $(OBJS)
+	$(AR) crsv $@ $^
+endif
+
+ifdef DSO_TARGET
+$(TARGET):: $(OBJS)
+	$(COMPILER_LINKER) $(CFLAGS) -o $(TARGET) $^ $(LDFLAGS)
+endif
+
+#
+# TODO KMOD_TARGET
+#
+
+clean::
+	@$(RM) $(TARGET) ..$(TARGET).debug ..$(TARGET).release
+	@$(RM) $(OBJS) $(DEPS)
+
+-include $(DEPS)

@@ -1,0 +1,17 @@
+.svn
+*.o
+*.a
+*.deps
+*.d
+*.so
+*.mod
+.*.swp
+mk.log
+isupdate
+iquery
+idelete
+getHashValue
+search_server
+merge_server
+merge_test
+testmod
