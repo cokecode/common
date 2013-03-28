@@ -1,0 +1,140 @@
+#! /usr/bin/perl -w
+# A sar-like system-wide process information saver and viewer.
+# zhangxun@taobao.com
+# 2011.03.01
+
+use strict;
+use warnings;
+use IO::File;
+use Data::Dumper;
+use Getopt::Long;
+use POSIX;
+
+my $g_file = '/tmp/proc-sar.data';
+
+sub parse_procinfo {
+    my ($filename) = (@_);
+    my $procinfo = {};
+    @{$procinfo}{qw/pid name state vsz rss/} = ('', '', '', 0, 0);
+    my $fp = IO::File->new($filename) or die "cannot open file $filename: $!";
+    while (<$fp>) {
+        if (/^Pid:\s*(\S+)/) {
+            $procinfo->{pid} = $1;
+        }
+        elsif (/^Name:\s*(\S+)/) {
+            $procinfo->{name} = $1;
+        }
+        elsif (/^State:\s*(\S+)/) {
+            $procinfo->{state} = $1;
+        }
+        elsif (/^VmSize:\s*(\S+)/) {
+            $procinfo->{vsz} = $1;
+        }
+        elsif (/^VmRSS:\s*(\S+)/) {
+            $procinfo->{rss} = $1;
+        }
+    }
+    $fp->close();
+    return join ',', @{$procinfo}{qw/pid name state vsz rss/};
+}
+
+sub travel_processes {
+    my @array;
+    foreach my $base (glob "/proc/*") {
+        chomp $base;
+        $base =~ s/^\s+|\s+$//g;
+        if ($base =~ m{/proc/(\d+)} && -r "$base/stat") {
+            push @array, parse_procinfo("$base/status");
+        }
+    }
+    my $fp = IO::File->new($g_file, 'a') or die "cannot write to file $g_file: $!";
+    print $fp time(), "|", join("\x01", @array), "\n";
+    $fp->close();
+}
+
+sub parse_rawdata {
+    my @procinfos;
+    foreach my $proc_rawdata (split "\x01", $_[0]) {
+        my $procinfo;
+        @{$procinfo}{qw/pid name state vsz rss/} = split ',', $proc_rawdata;
+        push @procinfos, $procinfo;
+    }
+    return \@procinfos;
+}
+
+sub print_procinfo_detail {
+    my ($datetime, $ref_procinfos) = @_;
+    print "$datetime| \n";
+
+    my ($total_vsz, $total_rss) = (0, 0);
+    foreach my $procinfo (@$ref_procinfos) {
+        $total_vsz += $procinfo->{vsz};
+        $total_rss += $procinfo->{rss};
+    }
+    my @newarray = reverse sort { $a->{rss} <=> $b->{rss} } @$ref_procinfos;
+
+    printf("    [%8d %8d]\n", $total_vsz, $total_rss);
+    for (my $i = 0; $i < 15; $i++) {
+        my $p = $newarray[$i];
+        printf("     %5d %3s %8d %8d   %-30s\n", $p->{pid}, $p->{state}, $p->{vsz}, $p->{rss}, $p->{name});
+    }
+}
+
+sub show_saved_data {
+    my ($file) = @_;
+    my $fp = IO::File->new($file) or die "ERROR: cannot open file <$file>: $!";
+    while (<$fp>) {
+        chomp;
+        if (/^(\d+)\|(.+)/) {
+            my ($ts, $rawdata) = ($1, $2);
+            my $datetime = POSIX::strftime('%F %T', localtime($ts));
+            my $ref_procinfos = parse_rawdata($rawdata);
+            print_procinfo_detail($datetime, $ref_procinfos);
+        }
+    }
+    $fp->close();
+}
+
+sub usage {
+    print STDERR "Travel processes and save to files.\n";
+    print STDERR "Usage: $0 [ options ]\n";
+    print STDERR "  -h, --help            print this message.\n";
+    print STDERR "  --cron                travel processes and save to files.\n";
+    print STDERR "  -l, --list            list saved processes.\n";
+    print STDERR "  -o, --output FILE     save to file (default is /tmp/proc-sar.data)\n";
+    print STDERR "  --daily-suffix        use \%m\%d as output file suffix.\n";
+    exit(1);
+}
+
+sub main {
+    my ($opt_help, $opt_cron, $opt_list, $opt_output, $opt_daily_suffix, $opt_file);
+    GetOptions ("help|h|?"      => \$opt_help,
+        "cron"          => \$opt_cron,
+        "list|l"        => \$opt_list,
+        "file|f=s"      => \$opt_file,
+        "output|o=s"    => \$opt_output,
+        "daily-suffix"  => \$opt_daily_suffix,
+    ) || usage();
+    defined($opt_help) and usage();
+    defined($opt_output) and $g_file = $opt_output;
+
+    if ($opt_daily_suffix) {
+        my ($mday, $mon);
+        (undef, undef, undef, $mday, $mon) = localtime(time);
+        $g_file = sprintf('%s.%02d%02d', $g_file, $mon, $mday);
+    }
+
+    if ($opt_cron) {
+        travel_processes();
+    }
+    elsif ($opt_list) {
+        show_saved_data($opt_file);
+    }
+    else {
+        usage();
+    }
+}
+
+main();
+
+# vim:ts=4:sw=4:ai:et

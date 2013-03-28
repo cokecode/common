@@ -1,0 +1,14 @@
+/tmp/proc-sar.data
+{
+daily
+rotate 120
+create
+nocompress
+notifempty
+prerotate
+/usr/bin/chattr -a /tmp/proc-sar.data
+endscript
+postrotate
+/usr/bin/chattr +a /tmp/proc-sar.data
+endscript
+}

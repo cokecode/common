@@ -1,0 +1,3 @@
+# cron proc-sar collect once per minute
+MAILTO=""
+* * * * * root /home/zhangxun/src/perl/proc-sar --cron
