@@ -27,11 +27,16 @@ function filter_by_area()
 
 ipdata="ipdata_code_with_maxmind.txt.utf8"
 
-filter_by_area $ipdata CN ",CN," || exit 1
+if [ ! -f $ipdata ]; then
+    echo "ERROR: $ipdata not exist."
+    exit 1
+fi
+
+#filter_by_area $ipdata CN ",CN," || exit 1
 filter_by_area $ipdata HK ",HK," || exit 1
-filter_by_area $ipdata MO ",MO," || exit 1
-filter_by_area $ipdata TW ",TW," || exit 1
-filter_by_area $ipdata BIGCHINESE ",CN,|,HK,|,MO,|,TW," || exit 1
+#filter_by_area $ipdata MO ",MO," || exit 1
+#filter_by_area $ipdata TW ",TW," || exit 1
+#filter_by_area $ipdata BIGCHINESE ",CN,|,HK,|,MO,|,TW," || exit 1
 
 ls -lrt IPDATA-*/goodclients-ip-*.conf
 
