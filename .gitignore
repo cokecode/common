@@ -14,3 +14,10 @@
 
 # Local backup files
 BAK.*
+
+.*
+!.gitignore
+
+## use may touch a X.anyfilename
+X.*
+
