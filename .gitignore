@@ -21,3 +21,5 @@ BAK.*
 ## use may touch a X.anyfilename
 X.*
 
+## Mac OS debug info
+*.dSYM
