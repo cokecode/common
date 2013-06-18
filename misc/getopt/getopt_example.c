@@ -33,6 +33,7 @@ static void parse_cmdline(int argc, char * argv[])
 	};
 	char c;
     int longidx = -1;
+    int i;
 
 	while ((c = getopt_long(argc, argv, "hvtxf:", opts, &longidx)) != -1)
 	{
@@ -65,6 +66,11 @@ static void parse_cmdline(int argc, char * argv[])
                 }
 		}
 	}
+
+    printf("optind = %d, argc = %d\n", optind, argc);
+    for (i = optind; i <= argc; i++) {
+        printf("arg %d: %s\n", i, argv[i]);
+    }
 }
 
 int main(int argc, char *argv[])
