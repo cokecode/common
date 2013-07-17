@@ -104,6 +104,14 @@ void foo(uint32_t a, uint32_t b)
             }
             return;
         }
+
+        // ==> { 4.17.143.128, 4.17.143.255 } | 4118FFF - 4118F80 = 7F
+        for (; a < b; a += 0x100) {
+            print_ip(a, 0, 24);
+        }
+        return;
+
+
         assert(0);
         return;
     }

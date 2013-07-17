@@ -25,15 +25,21 @@ function filter_by_area()
     fi
 }
 
-ipdata="ipdata_code_with_maxmind.txt.utf8"
 
-if [ ! -f $ipdata ]; then
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 ipdata_code_with_maxmind.txt.utf8"
+    exit 1
+fi
+
+ipdata="$1"
+
+if [ ! -f "$ipdata" ]; then
     echo "ERROR: $ipdata not exist."
     exit 1
 fi
 
-#filter_by_area $ipdata CN ",CN," || exit 1
-filter_by_area $ipdata HK ",HK," || exit 1
+filter_by_area $ipdata CN ",CN," || exit 1
+#filter_by_area $ipdata HK ",HK," || exit 1
 #filter_by_area $ipdata MO ",MO," || exit 1
 #filter_by_area $ipdata TW ",TW," || exit 1
 #filter_by_area $ipdata BIGCHINESE ",CN,|,HK,|,MO,|,TW," || exit 1
