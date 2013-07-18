@@ -1,0 +1,46 @@
+#!/usr/bin/stap
+# find the io topN process
+
+global file_rw_stat
+
+/*
+probe begin
+{
+	//printf("begin to check process whose io is heavy!\n");
+}
+*/
+
+probe ioblock.request 
+{
+	/*skip read from cache*/
+	if (devname != "N/A")
+	{
+		if (rw == 0 )
+		{
+			file_rw_stat[devname,ino,rw] += size;
+		}
+		else
+		{
+			isread = 1;
+			file_rw_stat[devname,ino,isread] += size;
+		}
+	}
+}
+
+probe timer.ms(10000)
+{
+	printf("monitor_file_rw.stp start\n");
+	foreach ([devicename,inode,rw] in file_rw_stat)
+	{
+		printf("%s %ld %d %d\n",devicename, inode, rw, file_rw_stat[devicename,inode,rw]);
+	}        
+	delete file_rw_stat 
+	printf("monitor_file_rw.stp end\n");
+}
+
+/*
+probe end
+{
+	//printf("just exit\n");
+}
+*/

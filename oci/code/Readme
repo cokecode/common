@@ -1,0 +1,37 @@
+Readme for Spatial OCI sample code
+
+This sample code illustrates the use of OCI in reading and writing instances 
+of type MDSYS.SDO_GEOMETRY from and to a table containing a column of type
+mdsys.sdo_geometry.
+
+The following chapters of the OCI documentation are relevant to this example:
+All of Part II: OCI Object Concepts 
+
+Additionally the following OCI object functions are used in the code:
+OCIDescribeAny(), OCIObjectNew(), OCIDefineObject(), OCIObjectPin(), 
+OCIObjectFree().
+
+See the file demo_sdo.mk for instructions on compiling the sample code.
+It is assumed you have an Oracle 8i server or client installation on
+the machine where these programs are being compiled. The ORACLE_HOME
+environment variable must be set appropriately.
+
+Usage:
+Writegeom assumes the user has a table named test_insert which has columns
+(gid NUMBER) and (geometry mdsys.sdo_geometry) at the very least. It is
+invoked on the command line as 
+writegeom username password
+
+Readgeom takes the following command line arguments:
+username 
+password
+table_name - Table with column of type mdsys.sdo_geometry
+geom_column_name - Name of column of type mdsys.sdo_geometry (e.g. Geometry)
+id_column_name - Name of column of type NUMBER that contains unique id values
+                 for rows in that table <table_name>, e.g. GID
+num_dimensions - Number of ordinates per point or vertex of a geometry,
+                 e.g. 2 if each point has (X,Y) coordinates.
+
+Sample command line invocation of readgeom:
+readgeom dan dan test_insert geometry gid 2 
+

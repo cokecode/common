@@ -1,0 +1,184 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.61 [en] (WinNT; U) [Netscape]">
+   <title>OTN: Oracle Spatial sample - OCI example</title>
+</head>
+<body bgcolor="#FFFFFF">
+<b><font size="4" face="Arial, Helvetica, sans-serif">Spatial OCI sample code</font></b> 
+<table width="650" border="0">
+  <tr valign="top"> 
+    <td height="1524"> 
+      <p><font size="2">This sample code includes two programs, <b>writegeom</b> 
+        and <b>readgeom</b>, that illustrate the use of OCI in writing and reading 
+        spatial data from and to Oracle8<i>i.</i></font> 
+      <ul>
+        <li><font size="2"><b><a href="#1"><font size="3">Prerequisites</font></a></b> 
+          </font></li>
+        <li><font size="3"><b><a href="#2">Compiling the sample programs</a></b></font></li>
+        <li><font size="3"><b><a href="#3">Using the Writegeom sample</a> </b></font></li>
+        <li><font size="3"><b><a href="#4">Using the Readgeom sample</a> </b></font></li>
+      </ul>
+      <p><font size="2"><a href="http://technet.oracle.com/support/bboard/discussions.htm" target="_blank">Give 
+        us feedback</a></font> 
+      <p><font size="2"><a href="../../files/oci_sample/ocicode.zip">Download 
+        the zip file for NT</a> <br>
+        <a href="../../files/oci_sample/ocicode.tar">Download tar file for Unix</a> 
+        </font> 
+      <p><font size="2"><a name="1"></a><b><font face="Arial, Helvetica, sans-serif" size="3">Prerequisites</font></b></font> 
+      <ul>
+        <li><font size="2">Oracle Spatial, release</font> <font size="2"> 8.1.5 
+          (or higher)<br>
+          <br>
+          </font></li>
+        <li><font size="2">Oracle8<i>i</i>, release 8.1.5 (or higher)<br>
+          <br>
+          </font></li>
+        <li><font size="2">An Oracle username and password <br>
+          <br>
+          </font></li>
+        <li><font size="2">A table named <b><code><font size="3">test_insert</font></code></b> 
+          which contains at least two columns of name and type:</font> 
+          <ul>
+            <li><font size="2"><code><b><font size="3">gid NUMBER</font></b> </code>(unique 
+              id number for the geometry)</font></li>
+            <li><font size="2"><code><b><font size="3">geometry mdsys.sdo_geometry</font></b></code> 
+              (stores the geometry)<br>
+              <br>
+              </font></li>
+          </ul>
+        </li>
+        <li><font size="2">Oracle client software (if sample programs are not 
+          installed on the same system as the Oracle server)<br>
+          <br>
+          </font></li>
+        <li><font size="2"><b>ORACLE_HOME </b>environment variable set to point 
+          to the instance containing the table <b><code><font size="3">test_insert</font></code></b> 
+          <br>
+          <br>
+          </font></li>
+        <li><font size="2">In the sample programs, the<i> <code><b><font size="3">&lt;dblink&gt;</font></b></code></i><b> 
+          </b>argument value of the function <b><code><font size="3">OCIServerAttach()</font></code></b> 
+          set to reflect the host name of the system running the Oracle server.</font></li>
+      </ul>
+      <p>&nbsp; 
+      <p><font size="2"><b><a name="2"></a><font face="Arial, Helvetica, sans-serif" size="3">Compiling 
+        the sample programs </font></b></font> 
+      <p><font size="2">See the file <a href="oci_sample.mk">oci_sample.mk</a> 
+        for instructions to compile the sample code. </font> 
+      <p><font size="2">The following OCI object functions are used in the code. 
+        For more information, review the <a href="http://technet.oracle.com/doc/oracle8i_816/appdev.816/index.htm">Oracle 
+        Call Interface Programmer's Guide</a> - Part II: OCI Object Concepts </font> 
+        <font size="2"><br>
+        <br>
+        </font> 
+      <table width="400" border="0">
+        <tr valign="top"> 
+          <td height="63"> 
+            <ul>
+              <li><code><font size="3">OCIDescribeAny() </font></code></li>
+              <li><code><font size="3">OCIObjectNew() </font></code></li>
+              <li><code><font size="3">OCIDefineObject()</font></code></li>
+            </ul>
+          </td>
+          <td height="63"> 
+            <ul>
+              <li><code><font size="3">OCIObjectPin(), </font></code></li>
+              <li><code><font size="3">OCIObjectFree() </font></code></li>
+            </ul>
+          </td>
+        </tr>
+      </table>
+      <p><font size="2"><b><a name="3"></a><font face="Arial, Helvetica, sans-serif" size="3">Using 
+        the writegeom sample </font></b></font> 
+      <p><font size="2"><b>writegeom</b> includes a hardcoded list of data. It 
+        uses this data to create the geometries that it loads into the table <b><code><font size="3">test_insert</font></code></b>. 
+        Feel free to modify the program to obtain geometry data from another source.</font> 
+      <ul>
+        <li><font size="2">Invoke writegeom from the command line by typing: </font> 
+          <p><font size="3"><code>writegeom &lt;<i>username</i>&gt; &lt;<i>password</i>&gt;</code></font></p>
+        </li>
+      </ul>
+      <p><font size="2"><b><a name="4"></a><font face="Arial, Helvetica, sans-serif" size="3">Using 
+        the readgeom sample </font></b></font> 
+      <p><font size="2"><b>readgeom</b> is a generic program that can read greometries 
+        from a user specified table with a column of type mdsys.sdo_geometry, 
+        and with any number of coordinates per point or vertex for the stored 
+        geometry. </font> 
+      <ul>
+        <li><font size="2"> Invoke readgeom from the command line by typing: </font> 
+          <p><font size="3"><code>readgeom &lt;<i>username</i>&gt; &lt;<i>password</i>&gt; 
+            &lt;<i>table name</i>&gt; &lt;<i>geometry column name</i>&gt; &lt;<i>number 
+            of coordinates</i>&gt; </code></font></p>
+        </li>
+      </ul>
+      <p><font size="2">Where: <br>
+        <br>
+        </font> 
+      <table width="543" border="0">
+        <tr> 
+          <td width="155"><code><font size="3">&lt;<i>username</i>&gt; <br>
+            &lt;<i>password</i>&gt; <br>
+            </font></code></td>
+          <td width="378"><font size="2">- your Oracle username and password</font></td>
+        </tr>
+        <tr> 
+          <td width="155" height="29"><code><font size="3">&lt;<i>table name</i>&gt;</font></code></td>
+          <td width="378" height="29"><font size="2">- a table with a column of 
+            type mdsys.sdo_geometry </font></td>
+        </tr>
+        <tr> 
+          <td height="33" width="155"><code><font size="3">&lt;<i>geometry column 
+            name</i>&gt;</font></code></td>
+          <td height="33" width="378"><font size="2">- the column of type mdsys.sdo_geometry 
+            </font></td>
+        </tr>
+        <tr> 
+          <td width="155"><code><font size="3">&lt;<i>number of coordinates</i>&gt; 
+            </font></code></td>
+          <td width="378"><font size="2">- the number of coordinates per point 
+            or vertex for the geometry</font></td>
+        </tr>
+      </table>
+      <ul>
+        <li><font size="2">Using the default information provided in this example, 
+          the command line is: </font>
+          <p><font size="3"><code>readgeom &lt;<i>username</i>&gt; &lt;<i>password</i>&gt; 
+            test_insert geometry 2</code></font></p>
+        </li>
+      </ul>
+      <p><font size="2">Where: <br>
+        <br>
+        </font> 
+      <table width="518" border="0">
+        <tr> 
+          <td width="96"><code><font size="3">&lt;<i>username</i>&gt; <br>
+            &lt;<i>password</i>&gt; <br>
+            </font></code></td>
+          <td width="412"><font size="2">- enter your Oracle username and password</font></td>
+        </tr>
+        <tr> 
+          <td width="96" height="25"><code><font size="3">test_insert</font></code></td>
+          <td width="412" height="25"><font size="2">- is the table with a column 
+            of type mdsys.sdo_geometry </font></td>
+        </tr>
+        <tr> 
+          <td height="33" width="96"><code><font size="3">geometry</font></code></td>
+          <td height="33" width="412"><font size="2">- is the the column of type 
+            mdsys.sdo_geometry </font></td>
+        </tr>
+        <tr> 
+          <td width="96"><code><font size="3">2</font></code></td>
+          <td width="412"><font size="2">- is the number of coordinates per point 
+            or vertex for the geometry</font></td>
+        </tr>
+      </table>
+      <p>&nbsp;
+    </td>
+  </tr>
+</table>
+<p>&nbsp;
+<p>&nbsp;
+</body>
+</html>

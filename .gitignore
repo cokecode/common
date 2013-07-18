@@ -15,6 +15,7 @@ a.out
 
 # Local backup files
 BAK.*
+X.*
 
 .*
 !.gitignore
@@ -24,3 +25,5 @@ X.*
 
 ## Mac OS debug info
 *.dSYM
+
+makeforge*
