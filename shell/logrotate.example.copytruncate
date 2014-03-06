@@ -1,0 +1,7 @@
+/tmp/trafmon.counter.log /tmp/trafmon.log {
+	rotate 5
+	size 64M
+	copy
+	copytruncate
+	nodateext
+}
