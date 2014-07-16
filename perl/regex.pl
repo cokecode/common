@@ -13,6 +13,7 @@ $result = $string =~ s/wor/WOR/;
 # $result should be: undef (failure)
 
 print $result? "Success" : "Failure", "\n";
+print !$result, "\n";
 
 =comment
 
