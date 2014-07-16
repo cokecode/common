@@ -1,0 +1,17 @@
+#! /usr/bin/perl -w
+
+use strict;
+
+my $sum = 0;
+while (<>) {
+    chomp;
+    $sum += $_ if /^\s*\d+(.\d+)?$/;
+}
+
+if (@ARGV > 0 and $ARGV[0] eq "-n") {
+    $sum = int($sum);
+}
+
+print("$sum\n");
+
+# vim:ts=4:sw=4:ai:et
