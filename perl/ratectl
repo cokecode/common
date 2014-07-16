@@ -1,0 +1,52 @@
+#! /usr/bin/perl -w
+# rate control script for stdin/stdout pipeline.
+# zhangxun@taobao.com
+# 2009-10-21
+
+use Getopt::Long;
+
+my ($limit, $begin, $total) = ('', time(), 0);
+
+GetOptions(  "help|h"       => \&usage,
+             "limit|l=s"    => \$limit,
+        ) || usage();
+$limit = normalize_limit($limit);
+usage() if ($limit == 0);
+
+while (1) {
+    my ($nread, $nwrote, $buf);
+    $nread = sysread(STDIN, $buf, 1024);
+    last if ($nread <= 0);
+    $nwrote = syswrite(STDOUT, $buf, $nread);
+    last if (!defined($nwrote));
+
+    my $elapse = time() - $begin;
+    $total += $nread;
+    $elapse = 1 if $elapse == 0;
+    if ($elapse > 0 and ($total / $elapse) > $limit) {
+        my $sleep = ($total - $elapse * $limit) / $limit;
+        sleep $sleep;
+    }
+}
+
+sub normalize_limit {
+    my ($value) = @_;
+    my $limit = 0;
+    $value =~ /^(\d+)B?$/i and $limit = $1;
+    $value =~ /^(\d+)KB?$/i and $limit = $1 * 1024;
+    $value =~ /^(\d+)MB?$/i and $limit = $1 * 1024 * 1024;
+    $value =~ /^(\d+)GB?$/i and $limit = $1 * 1024 * 1024 * 1024;
+    return $limit;
+}
+
+sub usage {
+    print STDERR ("Usage: $0 [options]\n");
+    print STDERR ("   -h --help               print this message.\n");
+    print STDERR ("   -l --limit BYTES        set rate limit (x bytes per second). BYTES may be followed by B, KB, MB, GB.\n");
+    print STDERR ("Examples,\n");
+    print STDERR ("   $0 -l 2KB\n");
+    print STDERR ("   $0 -l 3MB\n");
+    exit;
+}
+
+# vim:ts=4:sw=4:ai:et
