@@ -1,6 +1,6 @@
 #! /usr/bin/perl -w
 # A sar-like system-wide process information saver and viewer.
-# zhangxun@taobao.com
+# cokecoder AT gmail.com
 # 2011.03.01
 
 use strict;

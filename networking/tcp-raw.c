@@ -14,7 +14,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /*
- * 2013/08/20  modifyed by Paul (cokecoder@gmail.com).
+ * 2013/08/20  modifyed by Paul (cokecoder AT gmail.com).
  */
 
 // Send an IPv4 TCP packet via raw socket.

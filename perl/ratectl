@@ -1,6 +1,6 @@
 #! /usr/bin/perl -w
 # rate control script for stdin/stdout pipeline.
-# zhangxun@taobao.com
+# cokecoder AT gmail.com
 # 2009-10-21
 
 use Getopt::Long;

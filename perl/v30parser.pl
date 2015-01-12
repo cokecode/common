@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #*************************************************************************
-#*  Copyright (c) 2008 www.taobao.com        ALL RIGHTS RESERVED.        *
+#*  Copyright (c) 2008        ALL RIGHTS RESERVED.                       *
 #*************************************************************************
 
 =head1 NAME
@@ -13,7 +13,7 @@ iSearchResultParser.pl --help|h|?  brief help message
 
 iSearchResultParser.pl --man       full documentation
 
-Mail bug reports and suggestions to <guinan@taobao.com>.;
+Mail bug reports and suggestions to guinan.;
 
 =head1 OPTIONS
 
@@ -34,7 +34,7 @@ Prints the manual page and exits.
 B<This program> will read the iSearch result file or curl's stdout, parse it and then dump to stdout. Be careful, since the result is always big, you should redirect it to more or less to view it, or save it to file and then view it in editor.
 
 
-=head1 Author: Nan Zheng (guinan@taobao.com), www.taobao.com, Inc.
+=head1 Author: Nan Zheng.
 
 =head1 No known bugs
 

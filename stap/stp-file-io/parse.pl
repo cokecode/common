@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl -w
 # parse the output of monitor_file_rw.stp
-# feiman.wxg@taobao.com 2013-05
+# feiman.wxg 2013-05
 
 use strict;
 use FileHandle;

@@ -9,7 +9,7 @@
 #   hmap_set ctxdata counter 0
 #   hmap_inc ctxdata counter
 #
-# zhangxun@taobao.com
+# cokecoder AT gmail.com
 # 2010-03-19
 ################################################################################
 function hmap_create()

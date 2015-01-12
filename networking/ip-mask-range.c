@@ -1,4 +1,4 @@
-// cokecoder@gmail.com, 2014.5
+// cokecoder AT gmail.com, 2014.5
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

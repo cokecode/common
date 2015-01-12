@@ -1,5 +1,5 @@
 // Utility for inspecting exit value.
-// zhangxun@taobao.com
+// cokecoder AT gmail.com
 // 2012.2
 
 #include <stdlib.h>

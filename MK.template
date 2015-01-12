@@ -1,6 +1,6 @@
 ##############################################################################
 ## Makefile template
-## zhangxun@taobao.com
+## cokecoder AT gmail.com
 ## 2008-12-23
 
 ################################################################
@@ -61,7 +61,7 @@ clean::
 	$(RM) $(TARGET) $(OBJS) $(DEPS)
 
 help:
-	@echo 'Makefile for iSearch(R), Taobao.com 2008'
+	@echo 'Makefile for xxx, 2008'
 	@echo 'Options:'
 	@echo '  make O=3         => gcc -O3'
 	@echo '  make G=1         => gcc -g'
