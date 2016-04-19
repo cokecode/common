@@ -9,9 +9,9 @@ def bar():
 	## show call stack
 	for stack in inspect.stack():
 		## (<frame object at 0x7fdd22c90c20>, './test-inspect.py', 21, 'foo', ['\tbar()\n'], 0)
-		print stack
+		print ">", stack
 		## <type 'tuple'>
-		print type(stack)
+		print ">", type(stack)
 
 	## the caller frame and module
 	frame = inspect.stack()[1][0]
