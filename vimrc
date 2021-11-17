@@ -99,9 +99,9 @@ set noet
 nnoremap <F6> "=strftime("%Y/%m/%d %T")<CR>P
 inoremap <F6> <C-R>=strftime("%Y/%m/%d %T")<CR>
 
-nnoremap gA :!$HOME/bin/a<CR><CR>
-nnoremap gB :!$HOME/bin/a+build<CR>
-nnoremap gG :!$HOME/bin/G<CR><CR>
+" nnoremap gA :!$HOME/bin/a<CR><CR>
+" nnoremap gB :!$HOME/bin/a+build<CR>
+" nnoremap gG :!$HOME/bin/G<CR><CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " for netrw
@@ -138,21 +138,13 @@ if has('gui_running')
     command Mou !open -a mou %
     command -nargs=1 Ls !ls | grep -i <args>
 
-	if fnamemodify(argv(0), ":t") =~ "memo\..\*"
-		cd ~/memo/
-	endif
+" 	if fnamemodify(argv(0), ":t") =~ "memo\..\*"
+" 		cd ~/memo/
+" 	endif
 
-	if argc() == 0
-		cd ~/memo/
-		edit TODAY.markdown				" b1
-		badd+ link2						" b2
-		badd+ memo.2013-04-19.工作周报.WeeklyReport.markdown " b3
-		badd+ F.Internet.Industry		" b4
-		badd+ F.TechMemo				" b5 tech memo
-		badd+ F.Daily					" b6
-		badd+ memo.2013-03-01.LinuxOSAndKernel.markdown	" b7
-		badd+ E.People					" b8
-		badd+ memo.2013-05-07.Defender.代码学习.markdown " b9
-		badd+ F.WorkMethod				" b10
-	endif
+" 	if argc() == 0
+" 		cd ~/memo/
+" 		edit TODAY.markdown				" b1
+" 		badd+ link2						" b2
+" 	endif
 endif
